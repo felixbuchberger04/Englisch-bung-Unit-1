@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenses – Mixed Practice Lernspiel</title>
+<style>
+:root{--blue:#2357a5;--light:#eef4ff;--green:#16834a;--red:#b52b35;--ink:#172033}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eaf1ff,#f8fbff);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.app{width:min(850px,100%);background:white;border-radius:22px;box-shadow:0 14px 45px #17365d22;padding:clamp(20px,4vw,38px)}
+header{text-align:center;margin-bottom:22px}
+h1{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.2rem);color:var(--blue)}
+.sub{color:#53627a;margin:0}
+.progress-wrap{height:10px;background:#e6ebf4;border-radius:20px;overflow:hidden;margin:20px 0 8px}
+#progress{height:100%;width:0;background:var(--blue);transition:width .25s}
+.meta{display:flex;justify-content:space-between;gap:12px;font-size:.95rem;color:#526078}
+.card{background:var(--light);border:1px solid #dce7fc;border-radius:16px;padding:clamp(20px,4vw,30px);margin:22px 0}
+.label{font-size:.9rem;color:#526078;margin-bottom:12px}
+#question{font-size:clamp(1.15rem,3vw,1.5rem);line-height:1.55;font-weight:700}
+.hint{font-size:.95rem;color:#526078;margin-top:12px}
+input{width:100%;font-size:1.15rem;padding:14px 15px;border:2px solid #cbd5e1;border-radius:12px;outline:none}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2357a51c}
+.buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+button{border:0;border-radius:12px;padding:13px 20px;font-size:1rem;font-weight:700;cursor:pointer}
+.primary{background:var(--blue);color:white}
+.secondary{background:#e9eef7;color:#25344f}
+button:disabled{opacity:.45;cursor:not-allowed}
+#feedback{min-height:30px;margin-top:15px;font-weight:700;line-height:1.45}
+.good{color:var(--green)} .bad{color:var(--red)}
+.hidden{display:none!important}
+.summary{text-align:center}
+.score{font-size:2.4rem;color:var(--blue);font-weight:800;margin:14px}
+.review-list{text-align:left;line-height:1.6}
+.review-item{padding:12px 14px;border-radius:10px;background:#f5f7fb;margin:10px 0}
+.review-item strong{display:block}
+.small{font-size:.9rem;color:#5b6578}
+@media(max-width:500px){.meta{font-size:.82rem}button{flex:1}}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+<h1>🎯 Tenses – Mixed Practice</h1>
+<p class="sub">Setze die Verben in die richtige englische Zeitform.</p>
+</header>
+<section id="game">
+<div class="meta"><span id="counter">Aufgabe 1 von 30</span><span id="scoreLive">Richtig: 0</span></div>
+<div class="progress-wrap"><div id="progress"></div></div>
+<div class="card">
+<div class="label">Ergänze die Lücke. Schreibe nur die fehlende Verbform.</div>
+<div id="question"></div>
+<div class="hint">Tipp: Achte auf Signalwörter wie <em>yesterday</em>, <em>usually</em>, <em>right now</em> oder <em>tomorrow</em>.</div>
+</div>
+<form id="answerForm">
+<input id="answer" autocomplete="off" spellcheck="false" aria-label="Deine Antwort" placeholder="Deine Antwort …" required>
+<div class="buttons">
+<button class="primary" id="checkBtn" type="submit">Antwort prüfen</button>
+<button class="secondary" id="skipBtn" type="button">Überspringen</button>
+</div>
+</form>
+<div id="feedback" aria-live="polite"></div>
+</section>
+<section id="summary" class="summary hidden">
+<h2>Übung abgeschlossen!</h2>
+<div class="score" id="finalScore"></div>
+<p id="summaryText"></p>
+<div id="review"></div>
+<div class="buttons" style="justify-content:center">
+<button class="primary" id="retryBtn">Fehler wiederholen</button>
+<button class="secondary" id="restartBtn">Alle Aufgaben neu starten</button>
+</div>
+</section>
+</main>
+<script>
+const allQuestions = [{"q": "Next Saturday, we ______ (visit) our cousins.", "a": "are going to visit"}, {"q": "Mia ______ (watch) a film last night.", "a": "watched"}, {"q": "Look! The dog ______ (run) across the garden.", "a": "is running"}, {"q": "My dad usually ______ (leave) home at seven o’clock.", "a": "leaves"}, {"q": "I ______ (meet) my friends tomorrow afternoon.", "a": "am going to meet"}, {"q": "Tom had a birthday party yesterday, but I ______ (not / go).", "a": "didn't go"}, {"q": "Cats ______ (be) popular pets.", "a": "are"}, {"q": "Ben normally walks to school, but yesterday he ______ (take) the bus.", "a": "took"}, {"q": "My aunt ______ (buy) a new car next month.", "a": "is going to buy"}, {"q": "I’m sorry, but I ______ (not / think) that I can help you.", "a": "don't think"}, {"q": "Be quiet! The baby ______ (sleep) right now.", "a": "is sleeping"}, {"q": "Why ______ (you / wear) a coat today? It’s warm outside!", "a": "are you wearing"}, {"q": "We ______ (play) football in the park at the moment.", "a": "are playing"}, {"q": "Last summer, my family ______ (travel) to Italy.", "a": "travelled"}, {"q": "Our teacher ______ (speak) English very well.", "a": "speaks"}, {"q": "Listen! Somebody ______ (knock) at the door.", "a": "is knocking"}, {"q": "They ______ (build) a new sports hall next year.", "a": "are going to build"}, {"q": "Sam ______ (move) to a new flat right now.", "a": "is moving"}, {"q": "The queen ______ (live) in a palace when she was young.", "a": "lived"}, {"q": "I ______ (like) all my classmates.", "a": "like"}, {"q": "The cat usually sleeps on the sofa, but now it ______ (sleep) under the table.", "a": "is sleeping"}, {"q": "Ella ______ (buy) a new schoolbag two days ago.", "a": "bought"}, {"q": "Technology ______ (change) our lives in the future.", "a": "is going to change"}, {"q": "Leo ______ (speak) French very well.", "a": "speaks"}, {"q": "Somebody ______ (cry) for help! Can you hear that?", "a": "is crying"}, {"q": "All my friends ______ (enjoy) the party last weekend.", "a": "enjoyed"}, {"q": "My brother ______ (not / watch) TV right now. He is doing his homework.", "a": "isn't watching"}, {"q": "My uncle ______ (drive) to the mountains every weekend.", "a": "drives"}, {"q": "We ______ (see) the new adventure film tomorrow.", "a": "are going to see"}, {"q": "When she was a child, Anna ______ (live) in a small village.", "a": "lived"}];
+let queue=[], index=0, firstTryCorrect=0, errors=[], retryMode=false, answered=false;
+const $=id=>document.getElementById(id);
+function normalize(s){
+ return s.toLowerCase().trim().replace(/[’‘]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/,"");
+}
+function start(mode="all"){
+ retryMode=mode==="retry";
+ queue=retryMode ? [...errors] : shuffle([...allQuestions]);
+ if(!queue.length){queue=shuffle([...allQuestions]);retryMode=false;}
+ index=0; firstTryCorrect=0; errors=[]; answered=false;
+ $("game").classList.remove("hidden");$("summary").classList.add("hidden");
+ $("checkBtn").disabled=false;$("skipBtn").disabled=false;
+ render();
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function render(){
+ answered=false;
+ $("counter").textContent=`Aufgabe ${Math.min(index+1,queue.length)} von ${queue.length}`;
+ $("scoreLive").textContent=`Richtig: ${firstTryCorrect}`;
+ $("progress").style.width=`${index/queue.length*100}%`;
+ $("question").textContent=queue[index].q;
+ $("answer").value="";$("answer").disabled=false;
+ $("checkBtn").disabled=false;$("skipBtn").disabled=false;
+ $("skipBtn").textContent="Überspringen";
+ $("feedback").textContent="";$("feedback").className="";
+ $("answer").focus();
+}
+function next(){
+ index++;
+ if(index>=queue.length){finish();}else{render();}
+}
+$("answerForm").addEventListener("submit",e=>{
+ e.preventDefault();if(answered)return;
+ const item=queue[index], value=normalize($("answer").value);
+ if(value===normalize(item.a)){
+  firstTryCorrect++;
+  $("feedback").textContent="Richtig! Sehr gut!";$("feedback").className="good";
+  answered=true;$("answer").disabled=true;$("checkBtn").disabled=true;$("skipBtn").disabled=true;
+  setTimeout(next,850);
+ }else{
+  if(!errors.some(x=>x.q===item.q))errors.push(item);
+  $("feedback").textContent=`Leider falsch. Richtige Lösung: ${item.a}. Diese Aufgabe wird am Ende erneut abgefragt.`;
+  $("feedback").className="bad";
+  answered=true;
+  $("answer").disabled=true;
+  $("checkBtn").disabled=true;
+  $("skipBtn").disabled=true;
+  $("skipBtn").textContent="Weiter";
+  $("skipBtn").disabled=false;
+ }
+});
+$("skipBtn").addEventListener("click",()=>{
+ if(answered){
+  $("skipBtn").textContent="Überspringen";
+  next();
+  return;
+ }
+ const item=queue[index];
+ if(!errors.some(x=>x.q===item.q))errors.push(item);
+ $("feedback").textContent="Diese Aufgabe kommt am Ende bei der Fehlerwiederholung dran.";
+ $("feedback").className="bad";answered=true;
+ $("answer").disabled=true;$("checkBtn").disabled=true;$("skipBtn").disabled=true;
+ setTimeout(next,700);
+});
+function finish(){
+ $("game").classList.add("hidden");$("summary").classList.remove("hidden");
+ $("progress").style.width="100%";
+ $("finalScore").textContent=`${firstTryCorrect} / ${queue.length}`;
+ $("summaryText").textContent=errors.length===0?"Fantastisch! Du hast alle Aufgaben beim ersten Versuch richtig gelöst.":`Du hast ${errors.length} Aufgabe(n) zum Wiederholen. Übe sie jetzt noch einmal.`;
+ const review=$("review");review.innerHTML="";
+ if(errors.length){
+  const heading=document.createElement("h3");heading.textContent="Diese Aufgaben werden wiederholt:";review.appendChild(heading);
+  errors.forEach((it,i)=>{
+   const div=document.createElement("div");div.className="review-item";
+   const q=document.createElement("strong");q.textContent=`${i+1}. ${it.q}`;
+   const a=document.createElement("span");a.textContent=`Lösung: ${it.a}`;
+   div.append(q,a);review.appendChild(div);
+  });
+ }
+ $("retryBtn").classList.toggle("hidden",errors.length===0);
+}
+$("retryBtn").addEventListener("click",()=>start("retry"));
+$("restartBtn").addEventListener("click",()=>start("all"));
+start();
+</script>
+</body>
+</html>
